@@ -1,10 +1,10 @@
-package fr.lernejo.travelsite.repository;
+package fr.lernejo.travelsite.services;
 
 import fr.lernejo.travelsite.records.Client;
 
 import java.util.List;
 
-public interface ClientRepository {
+public interface ClientService {
     List<Client> findAll();
 
     Client findByUsername(String name);

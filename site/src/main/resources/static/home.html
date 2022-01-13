@@ -27,7 +27,7 @@
             var content;
             if(status == 200) {
                 var response = JSON.parse(httpRequest.responseText);
-                content = "<div>Vooici les destinations qui correspondent à vos critères:\n";
+                content = "<div>Voici les destinations qui correspondent à vos critères:\n";
                 content += "  <table class=\"table table-dark table-hover\">\n";
                 content += "    <thead>\n";
                 content += "      <tr>\n";
@@ -40,7 +40,7 @@
                 response.forEach(destination => {
                     content += "      <tr>\n";
                     content += "        <td>" + destination.country + "</th>\n";
-                    content += "        <td>" + destination.temperature + " °C</td>\n";
+                    content += "        <td>" + destination.temperature.toFixed(2) + " °C</td>\n";
                     content += "      </tr>\n";
                 });
 

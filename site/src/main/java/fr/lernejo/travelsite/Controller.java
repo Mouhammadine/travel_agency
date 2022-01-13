@@ -2,30 +2,33 @@ package fr.lernejo.travelsite;
 
 import fr.lernejo.travelsite.records.Client;
 import fr.lernejo.travelsite.records.Country;
-import fr.lernejo.travelsite.repository.ClientLocalService;
-import fr.lernejo.travelsite.repository.ClientRepository;
+import fr.lernejo.travelsite.services.ClientService;
+import fr.lernejo.travelsite.services.PredictionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
-import java.util.Arrays;
 
 @RestController
 @RequestMapping(path = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
 public class Controller {
-    private final ClientRepository repository = new ClientLocalService();
+    @Autowired private ClientService clients;
+    @Autowired private PredictionService prediction;
 
     @PostMapping("inscription")
     public void inscription(@Valid @RequestBody Client client) {
-        repository.addClient(client);
+        if (!prediction.countryExists(client.userCountry()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Given country doesn't exists");
+
+        clients.addClient(client);
     }
 
     @GetMapping("travels")
     public Iterable<Country> travels(@RequestParam(value="userName") String userName) {
-
-        return Arrays.asList(
-            new Country("Caribbean", 32.4f),
-            new Country("Australia", 35.1f)
-        );
+        Client client = clients.findByUsername(userName);
+        return prediction.getMatchingCountries(client);
     }
 }
