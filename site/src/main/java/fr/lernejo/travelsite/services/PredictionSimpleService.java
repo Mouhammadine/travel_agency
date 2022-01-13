@@ -2,7 +2,6 @@ package fr.lernejo.travelsite.services;
 
 import fr.lernejo.travelsite.PredictionEngineClient;
 import fr.lernejo.travelsite.records.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,7 +15,11 @@ import java.util.stream.Stream;
 
 @Service
 public class PredictionSimpleService implements PredictionService {
-    @Autowired private PredictionEngineClient client;
+    private final PredictionEngineClient client;
+
+    public PredictionSimpleService(PredictionEngineClient client) {
+        this.client = client;
+    }
 
     private Stream<String> listCountries() {
         try {

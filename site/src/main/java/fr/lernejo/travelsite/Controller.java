@@ -15,8 +15,13 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping(path = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
 public class Controller {
-    @Autowired private ClientService clients;
-    @Autowired private PredictionService prediction;
+    private final ClientService clients;
+    private final PredictionService prediction;
+
+    public Controller(ClientService clients, PredictionService prediction) {
+        this.clients = clients;
+        this.prediction = prediction;
+    }
 
     @PostMapping("inscription")
     public void inscription(@Valid @RequestBody Client client) {
