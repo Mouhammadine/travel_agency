@@ -142,11 +142,13 @@
             }
         );
         var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.location.href = "/home.html?name=" + encodeURIComponent(formData.userName);
+            }
+        };
         xhr.open(form.method, form.action, true);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-        xhr.onreadystatechange = () => {
-            document.location.href = "/home.html?name=" + encodeURIComponent(formData.userName);
-        };
         xhr.send(JSON.stringify(formData));
     }
 
