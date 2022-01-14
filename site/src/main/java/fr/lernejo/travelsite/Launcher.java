@@ -15,12 +15,8 @@ public class Launcher {
 
     @Bean
     PredictionEngineClient predictionEngineClient() {
-        String port = System.getenv("tackRedirectPort");
-        if (port == null)
-            port = "7080";
-
         Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("http://localhost:" + port + "/")
+            .baseUrl("http://localhost:7080/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
