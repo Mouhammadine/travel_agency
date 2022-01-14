@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping(path = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -34,6 +35,11 @@ public class Controller {
     @GetMapping("travels")
     public Iterable<Country> travels(@RequestParam(value="userName") String userName) {
         Client client = clients.findByUsername(userName);
-        return prediction.getMatchingCountries(client);
+
+        try {
+            return prediction.getMatchingCountries(client);
+        } catch (ResponseStatusException e) {
+            return new ArrayList<>();
+        }
     }
 }
