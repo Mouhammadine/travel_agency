@@ -6,6 +6,6 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 public interface PredictionEngineClient {
-    @GET("/api/temperature")
+    @GET("api/temperature")
     Call<Temperatures> getTemperatures(@Query("country") String country);
 }
