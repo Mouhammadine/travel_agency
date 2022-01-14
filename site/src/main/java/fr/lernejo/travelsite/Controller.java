@@ -35,11 +35,6 @@ public class Controller {
     @GetMapping("travels")
     public Iterable<Country> travels(@RequestParam(value="userName") String userName) {
         Client client = clients.findByUsername(userName);
-
-        try {
-            return prediction.getMatchingCountries(client);
-        } catch (ResponseStatusException e) {
-            return new ArrayList<>();
-        }
+        return prediction.getMatchingCountries(client);
     }
 }

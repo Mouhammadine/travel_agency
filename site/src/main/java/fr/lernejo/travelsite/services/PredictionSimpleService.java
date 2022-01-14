@@ -33,8 +33,8 @@ public class PredictionSimpleService implements PredictionService {
         }
     }
 
-    private ResponseStatusException apiError() {
-        return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal error: problem with prediction API");
+    private ResponseStatusException apiError(String message) {
+        return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal error: problem with prediction API: " + message);
     }
 
     private Country country(String country) {
@@ -42,15 +42,15 @@ public class PredictionSimpleService implements PredictionService {
             Temperatures temp = client.getTemperatures(country).execute().body();
 
             if (temp == null)
-                throw apiError();
+                throw apiError("no return");
 
             OptionalDouble op = temp.temperatures.stream().mapToDouble(t -> t.temperature).average();
             if (op.isEmpty())
-                throw apiError();
+                throw apiError("no return");
             else
                 return new Country(country, op.getAsDouble());
         } catch (IOException e) {
-            throw apiError();
+            throw apiError(e.getMessage());
         }
     }
 
