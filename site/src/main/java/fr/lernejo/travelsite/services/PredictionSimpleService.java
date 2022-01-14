@@ -5,6 +5,7 @@ import fr.lernejo.travelsite.records.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import retrofit2.Response;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,21 +38,31 @@ public class PredictionSimpleService implements PredictionService {
         return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal error: problem with prediction API: " + message);
     }
 
-    private Country country(String country) {
+    private Country country_(String country) {
         try {
-            Temperatures temp = client.getTemperatures(country).execute().body();
+            Response<Temperatures> resp = client.getTemperatures(country).execute();
 
-            if (temp == null)
-                throw apiError("no return");
+            if (resp.code() != 200 || resp.body() == null)
+                throw apiError("api failed with " + resp.code());
 
-            OptionalDouble op = temp.temperatures.stream().mapToDouble(t -> t.temperature).average();
-            if (op.isEmpty())
-                throw apiError("no return");
-            else
-                return new Country(country, op.getAsDouble());
+            OptionalDouble op = resp.body().temperatures.stream().mapToDouble(t -> t.temperature).average();
+            return new Country(country, op.orElse(0.0));
         } catch (IOException e) {
             throw apiError(e.getMessage());
         }
+    }
+
+    private Country country(String country) {
+        for (int i = 0; i < 5; i++) {
+            try {
+                return country_(country);
+            } catch (ResponseStatusException e) {
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ignore) {}
+            }
+        }
+        throw apiError("max try reached");
     }
 
     @Override
