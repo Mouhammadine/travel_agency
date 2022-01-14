@@ -10,6 +10,7 @@ import retrofit2.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.OptionalDouble;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -38,31 +39,18 @@ public class PredictionSimpleService implements PredictionService {
         return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal error: problem with prediction API: " + message);
     }
 
-    private Country country_(String country) {
+    private Country country(String country) {
         try {
             Response<Temperatures> resp = client.getTemperatures(country).execute();
 
             if (resp.code() != 200 || resp.body() == null)
-                throw apiError("api failed with " + resp.code());
+                return null;
 
             OptionalDouble op = resp.body().temperatures.stream().mapToDouble(t -> t.temperature).average();
             return new Country(country, op.orElse(0.0));
         } catch (IOException e) {
-            throw apiError(e.getMessage());
+            return null;
         }
-    }
-
-    private Country country(String country) {
-        for (int i = 0; i < 5; i++) {
-            try {
-                return country_(country);
-            } catch (ResponseStatusException e) {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ignore) {}
-            }
-        }
-        throw apiError("max try reached");
     }
 
     @Override
@@ -84,6 +72,7 @@ public class PredictionSimpleService implements PredictionService {
         return listCountries()
             .filter(s -> !s.equalsIgnoreCase(client.userCountry()))
             .map(this::country)
+            .filter(Objects::nonNull)
             .filter(temperatureOk)
             .toList();
     }
